@@ -62,7 +62,7 @@ class MatchStat():
                     trs.pop(8)
                     trs.pop(0)
                     match_info['player_info']=[]
-                    for i in range(1,len(trs)):
+                    for i in range(len(trs)):
                         try:
                             tds=[ t for t in trs[i].children ]
                         except IndexError:
