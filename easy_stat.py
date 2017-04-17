@@ -38,7 +38,7 @@ class MatchStat():
                 if user['Result'] and user['Result']=='OK':
                     try:
                         self.coll.insert_one(user)
-                        loginfo.info("Data successfully saved.,matchid:%d,id:%d"%(matchid,matchid-STARTID))
+                        loginfo.info("Data successfully saved.matchid:%d,id:%d"%(matchid,matchid-STARTID))
                         sleep(TIME_SLEEP)
                     except Exception,e:
                         logerror.error("Write data failed,matchid:%d,id:%d"%(matchid,matchid-STARTID)+str(e))

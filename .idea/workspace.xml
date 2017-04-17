@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="25828ac6-ccc1-4ffa-a15f-af78e61e016f" name="Default" comment="fix the issue of missing the first player's info">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/easy_stat.py" afterPath="$PROJECT_DIR$/easy_stat.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,8 +31,8 @@
       <file leaf-file-name="easy_stat.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/easy_stat.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="314">
-              <caret line="37" column="58" lean-forward="false" selection-start-line="37" selection-start-column="58" selection-end-line="37" selection-end-column="58" />
+            <state relative-caret-position="389">
+              <caret line="40" column="62" lean-forward="false" selection-start-line="40" selection-start-column="62" selection-end-line="40" selection-end-column="62" />
               <folding>
                 <element signature="e#15#25#0" expanded="true" />
                 <element signature="e#152#245#0" expanded="false" />
@@ -432,8 +433,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/easy_stat.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="314">
-          <caret line="37" column="58" lean-forward="false" selection-start-line="37" selection-start-column="58" selection-end-line="37" selection-end-column="58" />
+        <state relative-caret-position="389">
+          <caret line="40" column="62" lean-forward="false" selection-start-line="40" selection-start-column="62" selection-end-line="40" selection-end-column="62" />
           <folding>
             <element signature="e#15#25#0" expanded="true" />
             <element signature="e#152#245#0" expanded="false" />
