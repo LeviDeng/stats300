@@ -32,19 +32,20 @@ class MatchStat():
     def stat_match(self,matchid):
         no = int(matchid - STARTID + 1)
         try:
-            html=requests.get(BASE_URL+'match.html?id=%d'%matchid)
+            html=requests.get(BASE_URL+'api/getmatch?id=%d'%matchid)
             if html.status_code==200:
                 user=json.loads(html.text)
-                if user['Result'] and user['Resault']=='OK':
+                if user['Result'] and user['Result']=='OK':
                     try:
                         self.coll.insert_one(user)
+                        loginfo.info("Data successfully saved.,matchid:%d,id:%d"%(matchid,matchid-STARTID))
                         sleep(TIME_SLEEP)
                     except Exception,e:
-                        logerror.error("Write data failed,matchid:%d,id:%d"%(matchid,matchid-STARTID))
+                        logerror.error("Write data failed,matchid:%d,id:%d"%(matchid,matchid-STARTID)+str(e))
             else:
                 loginfo.warn("Get data failed!matchid:%d,id:%d"%(matchid,matchid-STARTID))
         except Exception,e:
-            loginfo.warn("unable to get match:%d,id:%d"%(matchid,matchid-STARTID))
+            loginfo.warn("unable to get match:%d,id:%d"%(matchid,matchid-STARTID)+str(e))
 
 if __name__=='__main__':
     m=MatchStat()
