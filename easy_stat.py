@@ -49,6 +49,7 @@ class MatchStat():
 
 if __name__=='__main__':
     m=MatchStat()
+    loginfo.info("-----------------------------------------------")
     try:
         TIME_SLEEP=float(sys.argv[3])
     except:
