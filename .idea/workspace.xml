@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="25828ac6-ccc1-4ffa-a15f-af78e61e016f" name="Default" comment="fix the issue of missing the first player's info">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/easy_stat.py" afterPath="$PROJECT_DIR$/easy_stat.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
