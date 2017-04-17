@@ -21,9 +21,8 @@ loginfo.addHandler(finfo)
 logerror.addHandler(ferror)
 
 BASE_URL="http://300report.jumpw.com/"
-STARTID=67482286
+STARTID=72008655
 TIME_SLEEP=2
-FLAG=0
 MONGODB_HOST=27017
 DB_NAME='three_handred_heros'
 COLLECTION_NAME='match_info'
