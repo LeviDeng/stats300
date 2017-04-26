@@ -29,23 +29,40 @@ class MatchStat():
     client=MongoClient('localhost',MONGODB_HOST)
     db=client[DB_NAME]
     coll=db[COLLECTION_NAME]
-    def stat_match(self,matchid):
+    def collect_match(self,matchid):
         no = int(matchid - STARTID + 1)
         try:
             html=requests.get(BASE_URL+'api/getmatch?id=%d'%matchid)
             if html.status_code==200:
                 user=json.loads(html.text)
-                if user['Result'] and user['Result']=='OK':
-                    try:
-                        self.coll.insert_one(user)
-                        loginfo.info("Data successfully saved.matchid:%d,id:%d"%(matchid,matchid-STARTID))
-                        sleep(TIME_SLEEP)
-                    except Exception,e:
-                        logerror.error("Write data failed,matchid:%d,id:%d"%(matchid,matchid-STARTID)+str(e))
-            else:
-                loginfo.warn("Get data failed!matchid:%d,id:%d"%(matchid,matchid-STARTID))
+                if user['Result'] and user['Result']=='OK' and self.coll.find({'matchid':matchid}).count()==0:
+                    user['matchid']=matchid
+                    user['no']=no
+                    #sleep(TIME_SLEEP)
+                    #print user
+                    return user
         except Exception,e:
             loginfo.warn("unable to get match:%d,id:%d"%(matchid,matchid-STARTID)+str(e))
+
+    def stat_match(self,start,end):
+        list=[]
+        j=0
+        for i in range(start,end):
+            if j<1000:
+                list.append(self.collect_match(i+STARTID))
+                j += 1
+            else:
+                try:
+                    self.coll.insert_many(list)
+                    loginfo.info("Data saved,id:%d"%(i%1000))
+                except Exception,e:
+                    logerror.error("Write data failed,id:%d"%(i%1000))
+                j=0
+                list=[]
+        try:
+            self.coll.insert_many(list)
+        except Exception, e:
+            logerror.error("Write data failed,id:%d" % (i % 1000))
 
 if __name__=='__main__':
     m=MatchStat()
@@ -54,5 +71,4 @@ if __name__=='__main__':
         TIME_SLEEP=float(sys.argv[3])
     except:
         pass
-    for i in range(int(sys.argv[1]),int(sys.argv[2])):
-        m.stat_match(i+STARTID)
+    m.stat_match(int(sys.argv[1]),int(sys.argv[2]))
