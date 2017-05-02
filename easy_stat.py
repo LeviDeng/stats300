@@ -49,20 +49,27 @@ class MatchStat():
         j=0
         for i in range(start,end):
             if j<1000:
-                list.append(self.collect_match(i+STARTID))
-                j += 1
+                try:
+                    user=self.collect_match(i+STARTID)
+                    if user:
+                        list.append(user)
+                        j += 1
+                    else:
+                        pass
+                except Exception:
+                    pass
             else:
                 try:
                     self.coll.insert_many(list)
-                    loginfo.info("Data saved,id:%d"%(i%1000))
+                    loginfo.info("Data saved,id:%d"%(i/1000))
                 except Exception,e:
-                    logerror.error("Write data failed,id:%d"%(i%1000))
+                    logerror.error("Write data failed,id:%d"%(i/1000))
                 j=0
                 list=[]
         try:
             self.coll.insert_many(list)
         except Exception, e:
-            logerror.error("Write data failed,id:%d" % (i % 1000))
+            logerror.error("Write data failed,id:%d" % (i/1000))
 
 if __name__=='__main__':
     m=MatchStat()
