@@ -35,7 +35,7 @@ class MatchStat():
             html=requests.get(BASE_URL+'api/getmatch?id=%d'%matchid)
             if html.status_code==200:
                 user=json.loads(html.text)
-                if user['Result'] and user['Result']=='OK' and self.coll.find({'matchid':matchid}).count()==0:
+                if user['Result'] and user['Result']=='OK': #and self.coll.find({'matchid':matchid}).count()==0:
                     user['matchid']=matchid
                     user['no']=no
                     #sleep(TIME_SLEEP)
@@ -63,13 +63,13 @@ class MatchStat():
                     self.coll.insert_many(list)
                     loginfo.info("Data saved,id:%d"%(i/1000))
                 except Exception,e:
-                    logerror.error("Write data failed,id:%d"%(i/1000))
+                    logerror.error("Write data failed,id:%d"%(i/1000)+str(e))
                 j=0
                 list=[]
         try:
             self.coll.insert_many(list)
         except Exception, e:
-            logerror.error("Write data failed,id:%d" % (i/1000))
+            logerror.error("Write data failed,id:%d" % (i/1000)+str(e))
 
 if __name__=='__main__':
     m=MatchStat()
