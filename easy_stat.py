@@ -68,6 +68,7 @@ class MatchStat():
                 list=[]
         try:
             self.coll.insert_many(list)
+            loginfo.info("Data saved,id:%d" % (i / 1000))
         except Exception, e:
             logerror.error("Write data failed,id:%d" % (i/1000)+str(e))
 
