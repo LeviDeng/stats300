@@ -29,19 +29,26 @@ COLLECTION_NAME='match_info'
 class MatchStat():
     client=MongoClient('localhost',MONGODB_HOST)
     coll=client[DB_NAME][COLLECTION_NAME]
-    uq=Queue(maxsize=1000)
-    dq=Queue(maxsize=1000)
+    uq=Queue(maxsize=100)
+    dq=Queue(maxsize=100)
     mq=Queue(maxsize=10)
+    end=0
     def putID(self,uq,start,end):
         for i in range(start,end):
-            while not uq.full():
-                uq.put(i)
+            uq.put(i,True)
+            #print i
+
+    def putID_forever(self,uq,start):
+        while True:
+            uq.put(start,True)
+            start += 1
 
     def collectMatch(self,uq,dq):
         while True:
             while not uq.empty():
-                matchid = uq.get_nowait()
-                no = int(matchid - STARTID + 1)
+                no = int(uq.get_nowait()+1)
+                #print no
+                matchid = int(no + STARTID - 1)
                 try:
                     html=requests.get(BASE_URL+'api/getmatch?id=%d'%matchid)
                     if html.status_code==200:
@@ -50,41 +57,75 @@ class MatchStat():
                                         self.coll.find({'no':no}).count()==0:
                             user['matchid']=matchid
                             user['no']=no
-                            sleep(TIME_SLEEP)
                             #print user
                             dq.put(user)
+                            sleep(TIME_SLEEP)
+                    #sleep(0.1)
                 except Exception:
                     uq.put(matchid)
+            #if self.end==1:
+                #break
 
     def putMatch(self,dq,mq):
         list=[]
         while True:
             for i in range(1000):
-                list.append(dq.get(True))
+                try:
+                    list.append(dq.get(True,timeout=1000))
+                except:
+                    break
             mq.put(list)
             list=[]
+            #if self.end==1:
+                #break
+
+    def insertMatch(self,dq,mq):
+        while True:
+            match=dq.get(True)
+            mq.put(match,True)
+
+    def insertData(self,mq):
+        while True:
+            try:
+                data=mq.get(True)
+                self.coll.insert_one(data)
+            except Exception,e:
+                logerror.error("Write data failed,id:%d" % (data['no']) + str(e))
+                mq.put(data,True)
 
     def writeData(self,mq):
         while True:
-            list=mq.get()
-            i=int(list[0]['no'])
             try:
-                self.coll.insert_many(list)
-                loginfo.info("Data saved,id:%d"%(i/1000))
-            except Exception,e:
-                logerror.error("Write data failed,id:%d"%(i/1000)+str(e))
-                mq.put(list)
+                list=mq.get(True,timeout=1000)
+                i=int(list[0]['no'])
+                try:
+                    self.coll.insert_many(list)
+                    loginfo.info("Data saved,id:%d,lastid:%d"%(i/1000,list[-1]))
+                except Exception,e:
+                    logerror.error("Write data failed,id:%d"%(i/1000)+str(e))
+                    mq.put(list)
+            except:
+                #self.end=1
+                #break
+                pass
 
-    def run(self,start,end):
-        p1=Process(target=self.putID,args=(self.uq,start,end,))
+    def run(self,list):
+        if len(list)==1:
+            p1 = Process(target=self.putID_forever, args=(self.uq, list[0],))
+        else:
+            p1=Process(target=self.putID,args=(self.uq,list[0],list[1],))
         p2=Process(target=self.collectMatch,args=(self.uq,self.dq,))
         p3=Process(target=self.putMatch,args=(self.dq,self.mq,))
         p4=Process(target=self.writeData,args=(self.mq,))
         pList=[p1,p2,p3,p4]
-        for p in pList:
-            p.start()
-            p.join()
-
+        p1.start()
+        p2.start()
+        p3.start()
+        p4.start()
+        p1.join()
+        p2.join()
+        p3.join()
+        p4.join()
 
 if __name__=='__main__':
     m=MatchStat()
@@ -93,4 +134,11 @@ if __name__=='__main__':
         TIME_SLEEP=float(sys.argv[3])
     except:
         pass
-    m.run(int(sys.argv[1]),int(sys.argv[2]))
+    if len(sys.argv)==3:
+        argvs=[int(sys.argv[1]),int(sys.argv[2])]
+    elif len(sys.argv)==2:
+        argvs=[int(sys.argv[1])]
+    else:
+        print "Usage: python %s  startno  [endno]  [time_split]"%(sys.argv[0])
+        sys.exit(0)
+    m.run(argvs)
