@@ -66,6 +66,15 @@ class MatchStat():
             #if self.end==1:
                 #break
 
+    def insertMatch(self,dq):
+        while True:
+            match=dq.get(True)
+            try:
+                self.coll.insert_one(match)
+            except Exception,e:
+                logerror.error("Write data failed,id:%d" % (match['no']) + str(e))
+                dq.put(match,True)
+
     def putMatch(self,dq,mq):
         list=[]
         while True:
@@ -78,20 +87,6 @@ class MatchStat():
             list=[]
             #if self.end==1:
                 #break
-
-    def insertMatch(self,dq,mq):
-        while True:
-            match=dq.get(True)
-            mq.put(match,True)
-
-    def insertData(self,mq):
-        while True:
-            try:
-                data=mq.get(True)
-                self.coll.insert_one(data)
-            except Exception,e:
-                logerror.error("Write data failed,id:%d" % (data['no']) + str(e))
-                mq.put(data,True)
 
     def writeData(self,mq):
         while True:
@@ -112,12 +107,12 @@ class MatchStat():
     def run(self,list):
         if len(list)==1:
             p1 = Process(target=self.putID_forever, args=(self.uq, list[0],))
-        else:
-            p1=Process(target=self.putID,args=(self.uq,list[0],list[1],))
-        p2=Process(target=self.collectMatch,args=(self.uq,self.dq,))
-        p3=Process(target=self.putMatch,args=(self.dq,self.mq,))
-        p4=Process(target=self.writeData,args=(self.mq,))
-        pList=[p1,p2,p3,p4]
+        elif len(list)==2:
+            p1 = Process(target=self.putID,args=(self.uq,list[0],list[1],))
+        p2 = Process(target=self.collectMatch,args=(self.uq,self.dq,))
+        p3 = Process(target=self.insertMatch,args=(self.dq,))
+        #p4 = Process(target=self.insertData,args=(self.mq,))
+        #pList=[p1,p2,p3,p4]
         p1.start()
         p2.start()
         p3.start()
