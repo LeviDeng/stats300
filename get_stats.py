@@ -1,18 +1,20 @@
 #coding:utf-8
 import pymongo
+import time
 client=pymongo.MongoClient('localhost',27017)
 coll=client['SanBaiHeros']['match_info']
 win_stat={}
-STARTNO=900000
+STARTNO=990000
 ENDNO=1000001
 with open('Heros.txt') as f:
     hero_list=f.readlines()
     #print hero_list[0].decode('utf8')
 
 def get_stats(hero_list):
-    for h in hero_list:
+    for i,h in enumerate(hero_list):
         h=h.strip()
-        print "stating hero %s"%h.decode('utf8')
+        print time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())+\
+              " : [%d/%d] stating hero %s"%(i+1,146,h.decode('utf8'))
         wins=coll.find({"$where":"this.no > %d && this.no < %d"%(STARTNO,ENDNO),\
                         "Match.WinSide.Hero.Name":h,"Match.MatchType":1}).count()
         lose=coll.find({"$where":"this.no > %d && this.no < %d"%(STARTNO,ENDNO),\
