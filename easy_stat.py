@@ -45,17 +45,19 @@ class MatchStat():
             start += 1
 
     def collectMatch(self,uq,dq):
+        client = MongoClient('localhost', MONGODB_HOST)
+        coll = client[DB_NAME][COLLECTION_NAME]
         while True:
             while not uq.empty():
                 no = int(uq.get_nowait()+1)
-                #print no
+                print no
                 matchid = int(no + STARTID - 1)
                 try:
                     html=requests.get(BASE_URL+'api/getmatch?id=%d'%matchid)
                     if html.status_code==200:
                         user=json.loads(html.text)
                         if user['Result'] and user['Result']=='OK' and \
-                                        self.coll.find({'no':no}).count()==0:
+                                        coll.find({'no':no}).count()==0:
                             user['matchid']=matchid
                             user['no']=no
                             #print user
@@ -72,11 +74,14 @@ class MatchStat():
                 #break
 
     def insertMatch(self,dq):
+        client = MongoClient('localhost', MONGODB_HOST)
+        coll = client[DB_NAME][COLLECTION_NAME]
         while True:
             match=dq.get(True)
             try:
-                self.coll.insert_one(match)
+                coll.insert_one(match)
                 self.last_valid_no=match['no']
+                loginfo.info("Data saved,id:%d" % (match['no']))
             except Exception,e:
                 logerror.error("Write data failed,id:%d" % (match['no']) + str(e))
                 dq.put(match,True)
@@ -95,12 +100,14 @@ class MatchStat():
                 #break
 
     def writeData(self,mq):
+        client = MongoClient('localhost', MONGODB_HOST)
+        coll = client[DB_NAME][COLLECTION_NAME]
         while True:
             try:
                 list=mq.get(True,timeout=1000)
                 i=int(list[0]['no'])
                 try:
-                    self.coll.insert_many(list)
+                    coll.insert_many(list)
                     loginfo.info("Data saved,id:%d,lastid:%d"%(i/1000,list[-1]))
                 except Exception,e:
                     logerror.error("Write data failed,id:%d"%(i/1000)+str(e))
