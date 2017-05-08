@@ -29,10 +29,11 @@ COLLECTION_NAME='match_info'
 class MatchStat():
     client=MongoClient('localhost',MONGODB_HOST)
     coll=client[DB_NAME][COLLECTION_NAME]
-    uq=Queue(maxsize=100)
+    uq=Queue(maxsize=10)
     dq=Queue(maxsize=100)
     mq=Queue(maxsize=10)
     end=0
+    last_valid_no=0
     def putID(self,uq,start,end):
         for i in range(start,end):
             uq.put(i,True)
@@ -60,9 +61,13 @@ class MatchStat():
                             #print user
                             dq.put(user)
                             sleep(TIME_SLEEP)
+                        elif html.text.strip()=="sql: no rows in result set" \
+                                and no>self.last_valid_no:
+                           uq.put(no)
+                           sleep(1)
                     #sleep(0.1)
                 except Exception:
-                    uq.put(matchid)
+                    uq.put(no)
             #if self.end==1:
                 #break
 
@@ -71,6 +76,7 @@ class MatchStat():
             match=dq.get(True)
             try:
                 self.coll.insert_one(match)
+                self.last_valid_no=match['no']
             except Exception,e:
                 logerror.error("Write data failed,id:%d" % (match['no']) + str(e))
                 dq.put(match,True)
