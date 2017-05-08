@@ -52,24 +52,24 @@ class MatchStat():
                 no = int(uq.get_nowait()+1)
                 print no
                 matchid = int(no + STARTID - 1)
-                try:
-                    html=requests.get(BASE_URL+'api/getmatch?id=%d'%matchid)
-                    if html.status_code==200:
-                        user=json.loads(html.text)
-                        if user['Result'] and user['Result']=='OK' and \
-                                        coll.find({'no':no}).count()==0:
-                            user['matchid']=matchid
-                            user['no']=no
-                            #print user
-                            dq.put(user)
-                            sleep(TIME_SLEEP)
-                        elif html.text.strip()=="sql: no rows in result set" \
-                                and no>self.last_valid_no:
-                           uq.put(no)
-                           sleep(1)
-                    #sleep(0.1)
-                except Exception:
-                    uq.put(no)
+                if coll.find({'no':no}).count()==0:
+                    try:
+                        html=requests.get(BASE_URL+'api/getmatch?id=%d'%matchid)
+                        if html.status_code==200:
+                            user=json.loads(html.text)
+                            if user['Result'] and user['Result']=='OK':
+                                user['matchid']=matchid
+                                user['no']=no
+                                #print user
+                                dq.put(user,True)
+                                sleep(TIME_SLEEP)
+                            elif html.text.strip()=="sql: no rows in result set" \
+                                    and no>self.last_valid_no:
+                               uq.put(no)
+                               sleep(1)
+                        #sleep(0.1)
+                    except Exception:
+                        uq.put(no)
             #if self.end==1:
                 #break
 
