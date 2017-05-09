@@ -30,8 +30,8 @@ class MatchStat():
     client=MongoClient('localhost',MONGODB_HOST)
     coll=client[DB_NAME][COLLECTION_NAME]
     uq=Queue(maxsize=10)
-    dq=Queue(maxsize=100)
-    mq=Queue(maxsize=10)
+    dq=Queue(maxsize=2)
+    mq=Queue(maxsize=2)
     end=0
     last_valid_no=0
     def putID(self,uq,start,end):
@@ -49,7 +49,7 @@ class MatchStat():
         coll = client[DB_NAME][COLLECTION_NAME]
         while True:
             while not uq.empty():
-                no = int(uq.get_nowait()+1)
+                no = int(uq.get()+1)
                 print no
                 matchid = int(no + STARTID - 1)
                 if coll.find({'no':no}).count()==0:
