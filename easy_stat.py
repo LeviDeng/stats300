@@ -36,13 +36,17 @@ class MatchStat():
     last_valid_no=0
     def putID(self,uq,start,end):
         for i in range(start,end):
-            uq.put(i,True)
+            while True:
+                if int(uq.qsize())<9:
+                    uq.put(i)
+                    break
             #print i
 
     def putID_forever(self,uq,start):
         while True:
-            uq.put(start,True)
-            start += 1
+            if int(uq.qsize())<9:
+                uq.put(start)
+                start += 1
 
     def collectMatch(self,uq,dq):
         client = MongoClient('localhost', MONGODB_HOST)
@@ -63,9 +67,9 @@ class MatchStat():
                                 #print user
                                 dq.put(user,True)
                                 sleep(TIME_SLEEP)
-                            elif html.text.strip()=="sql: no rows in result set" \
+                            elif html.text.strip()== u'{"Result":"sql: no rows in result set"}' \
                                     and no>self.last_valid_no:
-                               uq.put(no)
+                               uq.put(no,True)
                                sleep(1)
                         #sleep(0.1)
                     except Exception:
