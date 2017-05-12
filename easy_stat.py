@@ -22,6 +22,7 @@ logerror.addHandler(ferror)
 BASE_URL="http://300report.jumpw.com/"
 STARTID=72008655
 TIME_SLEEP=0.1
+TIME_SLEEP_RETRY=1
 MONGODB_HOST=27017
 DB_NAME='SanBaiHeros'
 COLLECTION_NAME='match_info'
@@ -30,7 +31,7 @@ class MatchStat():
     client=MongoClient('localhost',MONGODB_HOST)
     coll=client[DB_NAME][COLLECTION_NAME]
     uq=Queue(maxsize=10)
-    dq=Queue(maxsize=2)
+    dq=Queue(maxsize=10)
     mq=Queue(maxsize=2)
     end=0
     last_valid_no=0
@@ -54,13 +55,14 @@ class MatchStat():
         while True:
             while not uq.empty():
                 no = int(uq.get()+1)
-                print no
+                #print no
                 matchid = int(no + STARTID - 1)
                 if coll.find({'no':no}).count()==0:
                     try:
                         html=requests.get(BASE_URL+'api/getmatch?id=%d'%matchid)
                         if html.status_code==200:
                             user=json.loads(html.text)
+                            uq.put(no,True)
                             if user['Result'] and user['Result']=='OK':
                                 user['matchid']=matchid
                                 user['no']=no
@@ -70,7 +72,7 @@ class MatchStat():
                             elif html.text.strip()== u'{"Result":"sql: no rows in result set"}' \
                                     and no>self.last_valid_no:
                                uq.put(no,True)
-                               sleep(1)
+                               sleep(TIME_SLEEP_RETRY)
                         #sleep(0.1)
                     except Exception:
                         uq.put(no)
