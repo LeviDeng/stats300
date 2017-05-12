@@ -7,13 +7,14 @@ import json
 from pymongo import MongoClient
 import logging
 from multiprocessing import Process, Queue
+import time
 logformat=logging.Formatter("%(message)s %(asctime)s \
                      %(levelname)s ")
 loginfo=logging.getLogger('info')
 loginfo.setLevel(logging.INFO)
 logerror=logging.getLogger('error')
-finfo=logging.FileHandler('info.log')
-ferror=logging.FileHandler('error.log')
+finfo=logging.FileHandler('logs/info_%s.log'%time.strftime("%Y-%m-%d"))
+ferror=logging.FileHandler('logs/error.log')
 finfo.setFormatter(logformat)
 ferror.setFormatter(logformat)
 loginfo.addHandler(finfo)
