@@ -59,7 +59,7 @@ class MatchStat():
         coll = client[DB_NAME][COLLECTION_NAME]
         while True:
             while not uq.empty():
-                no = int(uq.get()+1)
+                no = int(uq.get_nowait()+1)
                 #uq.put(no-1)
                 #print no
                 matchid = int(no + STARTID - 1)
