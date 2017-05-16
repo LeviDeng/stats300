@@ -60,7 +60,7 @@ class MatchStat():
         while True:
             while not uq.empty():
                 no = int(uq.get()+1)
-                uq.put(no-1)
+                #uq.put(no-1)
                 #print no
                 matchid = int(no + STARTID - 1)
                 if coll.find({'no':no}).count()==0:
@@ -76,7 +76,7 @@ class MatchStat():
                                 dq.put(user,True)
                                 sleep(TIME_SLEEP)
                             elif html.text.strip()== u'{"Result":"sql: no rows in result set"}' \
-                                    and no>self.last_valid_no:
+                                    and (no+10)>self.last_valid_no:
                                uq.put(no,True)
                                sleep(TIME_SLEEP_RETRY)
                         #sleep(0.1)
