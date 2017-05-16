@@ -31,7 +31,7 @@ COLLECTION_NAME='match_info'
 class MatchStat():
     client=MongoClient('localhost',MONGODB_HOST)
     coll=client[DB_NAME][COLLECTION_NAME]
-    uq=Queue(maxsize=10)
+    uq=Queue(maxsize=22)
     dq=Queue(maxsize=10)
     mq=Queue(maxsize=2)
     end=0
@@ -48,7 +48,7 @@ class MatchStat():
 
     def putID_forever(self,uq,start):
         while True:
-            if int(uq.qsize())<9:
+            if int(uq.qsize())<10:
                 uq.put(start)
                 start += 1
             else:
