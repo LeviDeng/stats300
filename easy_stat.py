@@ -61,7 +61,7 @@ class MatchStat():
             while not uq.empty():
                 no = int(uq.get_nowait()+1)
                 #uq.put(no-1)
-                #print no
+                print no
                 matchid = int(no + STARTID - 1)
                 if coll.find({'no':no}).count()==0:
                     try:
