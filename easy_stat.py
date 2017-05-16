@@ -39,9 +39,11 @@ class MatchStat():
     def putID(self,uq,start,end):
         for i in range(start,end):
             while True:
-                if int(uq.qsize())<9:
+                if int(uq.qsize())<10:
                     uq.put(i)
                     break
+                else:
+                    sleep(0.1)
             #print i
 
     def putID_forever(self,uq,start):
@@ -49,6 +51,8 @@ class MatchStat():
             if int(uq.qsize())<9:
                 uq.put(start)
                 start += 1
+            else:
+                sleep(0.1)
 
     def collectMatch(self,uq,dq):
         client = MongoClient('localhost', MONGODB_HOST)
@@ -56,6 +60,7 @@ class MatchStat():
         while True:
             while not uq.empty():
                 no = int(uq.get()+1)
+                uq.put(no-1)
                 #print no
                 matchid = int(no + STARTID - 1)
                 if coll.find({'no':no}).count()==0:
